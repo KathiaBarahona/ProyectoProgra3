@@ -18,6 +18,10 @@ public:
     double getLempiras()const;
     double getLitro()const;
     double getKm()const;
+    void setFecha(QString);
+    void setLempiras(double);
+    void setKm(double);
+    void setLitro(double);
     friend ostream& operator<<(ostream&, Factura&);
 
 };

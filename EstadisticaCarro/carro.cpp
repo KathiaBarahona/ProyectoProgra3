@@ -68,7 +68,7 @@ ostream& operator <<(ostream& output,Carro& c){
     output<<c.placa.toStdString()<<","<<c.marca.toStdString()<<","<<c.cilindraje<<","<<c.gasmax<<","<<c.gasactual<<","<<c.stops<<"!";
     for(int i=0;i<c.facturas.size();i++)
       output<<c.facturas[i];
-    output<<endl;
+      output<<endl;
     return output;
 }
 
