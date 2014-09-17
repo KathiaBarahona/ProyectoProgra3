@@ -27,6 +27,8 @@ int Carro::getStops()const{
     return stops;
 }
 void Carro::setGasActual(double gasactual){
+     if(gasactual>gasmax)
+         gasactual=0;
      this->gasactual=gasactual;
 }
 void Carro::setStops(int stops){
@@ -37,35 +39,37 @@ void Carro::addFactura(const Factura &f){
     facturas.append(fact);
 }
 double Carro::promediokml()const{
-    double promedio=0;
+    double kmtotales=0;
+    double litrostotales=0;
     for(int i=1;i<facturas.size();i++){
-        promedio+=facturas[i].getKm()/facturas[i].getLitro();
+        kmtotales+=facturas[i].getKm();
+        litrostotales+=facturas[i].getLitro();
     }
-    return promedio/(facturas.size()-1);
+    return kmtotales/litrostotales;
 }
 double Carro::promediokmg()const{
-    double promedio=0;
-    for(int i=1;i<facturas.size();i++){
-        promedio+=facturas[i].getKm()/(facturas[i].getLitro()*3.8);
-    }
-    return promedio/(facturas.size()-1);
+     return promediokml()*3.785412;
 }
 double Carro::promediolempkm()const{
-    double promedio=0;
+    double kmtotales=0;
+    double lempirastotales=0;
     for(int i=1;i<facturas.size();i++){
-        promedio+=facturas[i].getLempiras()/facturas[i].getKm();
+        lempirastotales+=facturas[i].getLempiras();
+        kmtotales+=facturas[i].getKm();
     }
-    return promedio/(facturas.size()-1);
+    return lempirastotales/kmtotales;
 }
 double Carro::promediolempdia()const{
-    double promedio=0;
+    double diastotales=0;
+    double lempirastotales=0;
     for(int i=1;i<facturas.size();i++){
-        promedio+=(facturas[i].getDia()-facturas[i-1].getDia())/facturas[i].getKm();
+        diastotales+=facturas[i].getDia()-facturas[i-1].getDia();
+        lempirastotales+=facturas[i].getLempiras();
     }
-    return promedio/(facturas.size()-1);
+    return lempirastotales/diastotales;
 }
 ostream& operator <<(ostream& output,Carro& c){
-    output<<c.placa.toStdString()<<","<<c.marca.toStdString()<<","<<c.cilindraje<<","<<c.gasmax<<","<<c.gasactual<<","<<c.stops<<"!";
+    output<<c.placa.toStdString()<<","<<c.marca.toStdString()<<","<<c.cilindraje<<","<<c.gasmax<<","<<c.gasactual<<","<<c.stops<<";";
     for(int i=0;i<c.facturas.size();i++)
       output<<c.facturas[i];
       output<<endl;

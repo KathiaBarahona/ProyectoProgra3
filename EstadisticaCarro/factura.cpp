@@ -64,7 +64,7 @@ void Factura:: setLitro(double litros){
 
 ostream& operator <<(ostream& output,Factura& f){
 
-    output<<f.fecha.toStdString()<<","<<f.lempiras<<","<<f.litros<<","<<f.km<<"&";
+    output<<f.fecha.toStdString()<<","<<f.lempiras<<","<<f.litros<<","<<f.km<<";";
     return output;
 
 

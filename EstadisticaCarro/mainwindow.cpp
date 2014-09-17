@@ -22,7 +22,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
-
+    string temp;
+    Factura f(0,0,0);
+    char * cadena=NULL;
+    char * cadena2=NULL;
+    char * cadena3=NULL;
+    int vuelta2=0;
+    QString placa;
+    QString marca;
+    int cilindraje;
+    double gasmax;
+    double gasactual;
+    int stops;
+    QString fecha;
+    double lempiras;
+    double litros;
+    double km;
+    vector<char *> cf;
     ui->treeWidget->setColumnCount(3);
     treeItem = new QTreeWidgetItem(ui->treeWidget);
     treeItem->setText(0,"Placa");
@@ -31,110 +47,74 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QString archivo = QFileDialog::getOpenFileName(this,tr("Open File"),"",tr("Files (*.txt)"));
     if(archivo!=""){
-        string temp;
-        char* cadena=NULL;
-        char* cadena2=NULL;
-        char* cadena3=NULL;
-        char* cadena4=NULL;
-        int vuelta=0;
-        int vuelta2=0;
-        QString placa;
-        QString marca;
-        int cilindraje;
-        double gasmax;
-        double gasactual;
-        int stops;
-        QString fecha;
-        double lempiras;
-        double litros;
-        double km;
+
         ifstream entrada(archivo.toStdString().c_str());
         while(!entrada.eof()){
             getline(entrada,temp);
             cadena=new char[temp.size()+1];
             strcpy(cadena,temp.c_str());
-            cadena2= strtok(cadena,"!");
-            vuelta=0;
+            cadena2 = strtok(cadena,";");
             while(cadena2!=NULL){
+                cf.push_back(cadena2);
+                cadena2 = strtok(NULL,";");
+
+            }
+            for(int i=0;i<(signed)cf.size();i++){
+                cadena3= new char[temp.size()+1];
+                cadena3= strtok(cf[i],",");
                 vuelta2=0;
-                if(vuelta==0){
-                    cadena3=strtok(cadena2,",");
-                    while(cadena3!=NULL){
-                        if(vuelta2==0)
-                            placa=cadena3;
-                        if(vuelta2==1)
-                            marca=cadena3;
+                while(cadena3 != NULL){
+                    if(i==0){
+                        if(vuelta2==0){
+                            placa=QString::fromStdString(cadena3);
+                        }
+                        if(vuelta2==1){
+                            marca=QString::fromStdString(cadena3);
+                        }
                         if(vuelta2==2){
-                            QString c;
-                            c=cadena3;
-                            cilindraje=c.toInt();
+                            cilindraje=QString::fromStdString(cadena3).toInt();
                         }
                         if(vuelta2==3){
-                            QString g;
-                            g=cadena3;
-                            gasmax=g.toDouble();
+                            gasmax=QString::fromStdString(cadena3).toDouble();
                         }
                         if(vuelta2==4){
-                            QString g;
-                            g=cadena3;
-                            gasactual=g.toDouble();
+                            gasactual=QString::fromStdString(cadena3).toDouble();
                         }
                         if(vuelta2==5){
-                            QString s;
-                            s=cadena3;
-                            stops=s.toInt();
+                            stops=QString::fromStdString(cadena3).toInt();
+                            carros.push_back(new Carro(placa,marca,cilindraje,gasmax));
+                            carros[carros.size()-1]->setGasActual(gasactual);
+                            carros[carros.size()-1]->setStops(stops);
                         }
-                        vuelta2++;
-                        cadena3= strtok(NULL,",");
+
+                    }else{
+
+                        if(vuelta2==0){
+                            fecha=QString::fromStdString(cadena3);
+                            f.setFecha(fecha);
+                        }
+                        if(vuelta2==1){
+                            lempiras=QString::fromStdString(cadena3).toDouble();
+                            f.setLempiras(lempiras);
+                        }
+                        if(vuelta2==2){
+                            litros=QString::fromStdString(cadena3).toDouble();
+                            f.setLitro(litros);
+                        }
+                        if(vuelta2==3){
+                            km=QString::fromStdString(cadena3).toDouble();
+                            f.setKm(km);
+                            carros[carros.size()-1]->addFactura(f);
+                        }
 
                     }
-                    carros.push_back(new Carro(placa,marca,cilindraje,gasmax));
-                    carros[carros.size()-1]->setGasActual(gasactual);
-                    carros[carros.size()-1]->setStops(stops);
-
-                }else{
-                    cadena3=strtok(cadena2,"&");
-                    while(cadena3!=NULL){
-                        cadena4=strtok(cadena3,",");
-                        while(cadena4!=NULL){
-                            if(vuelta2==0)
-                                fecha=cadena3;
-                            if(vuelta2==1){
-                                QString l;
-                                l=cadena3;
-                                lempiras=l.toInt();
-                            }
-                            if(vuelta2==2){
-                                QString l;
-                                l=cadena3;
-                                litros=l.toDouble();
-                            }
-                            if(vuelta2==3){
-                                QString k;
-                                k=cadena3;
-                                km=k.toDouble();
-                            }
-                            cadena4= strtok(NULL,",");
-                        }
-                        vuelta2++;
-                        cadena3= strtok(NULL,"&");
-                    }
-                    Factura f(0,0,0);
-                    f.setFecha(fecha);
-                    f.setKm(km);
-                    f.setLempiras(lempiras);
-                    f.setLitro(litros);
-                    carros[carros.size()-1]->addFactura(f);
+                    vuelta2++;
+                    cadena3= strtok(NULL,",");
                 }
-                vuelta++;
-                cadena2= strtok(NULL,"!");
             }
-
+            cf.clear();
         }
-
-
         entrada.close();
-        cout<<carros.size()<<endl;
         for(int i=0;i<carros.size();i++){
             QTreeWidgetItem *treeItem2=new QTreeWidgetItem();
             treeItem2->setText(0,carros[i]->getPlaca());
@@ -143,10 +123,11 @@ MainWindow::MainWindow(QWidget *parent) :
             treeItem->addChild(treeItem2);
             ui->listWidget->addItem(new QListWidgetItem(carros[i]->getPlaca()));
         }
+
+
+
+
     }
-
-
-
 }
 void MainWindow:: closeEvent(QCloseEvent *event){
     QMessageBox mb;
@@ -159,7 +140,7 @@ void MainWindow:: closeEvent(QCloseEvent *event){
         QString archivo = QFileDialog::getSaveFileName(this,tr("Save File"),"",tr("Files (*.txt)"));
         if(archivo!=""){
             ofstream salida;
-            salida.open(archivo.toStdString().c_str(),ios::binary|ios::app);
+            salida.open(archivo.toStdString().c_str(),ios::out|ios::trunc);
             for(int i=0;i<carros.size();i++){
                 salida<<*carros[i];
             }

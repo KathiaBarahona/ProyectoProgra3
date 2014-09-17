@@ -15,7 +15,7 @@ class Carro
     QList<Factura> facturas;
 public:
     Carro();
-    Carro(QString placa,QString marca,int cilindraje,int gasmax);
+    Carro(QString ,QString ,int ,int );
     QString getPlaca()const;
     QString getMarca()const;
     int getCilindraje()const;
