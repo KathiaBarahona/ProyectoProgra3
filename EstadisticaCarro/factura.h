@@ -11,7 +11,7 @@ class Factura
     double litros;
     double km;
 public:
-    Factura(double,double, double);
+    Factura(double,double, double,QString);
     Factura(const Factura&);
     QString toString() const;
     int getDia() const;

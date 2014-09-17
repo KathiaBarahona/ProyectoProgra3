@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     string temp;
-    Factura f(0,0,0);
+    Factura f(0,0,0,"");
     char * cadena=NULL;
     char * cadena2=NULL;
     char * cadena3=NULL;
@@ -39,12 +39,9 @@ MainWindow::MainWindow(QWidget *parent) :
     double litros;
     double km;
     vector<char *> cf;
-    ui->treeWidget->setColumnCount(3);
-    treeItem = new QTreeWidgetItem(ui->treeWidget);
-    treeItem->setText(0,"Placa");
-    treeItem->setText(1,"Marca");
-    treeItem->setText(2,"Cilindraje");
-
+    ui->cb_gasolina->addItem("Diesel");
+    ui->cb_gasolina->addItem("Regular");
+    ui->cb_gasolina->addItem("Super");
     QString archivo = QFileDialog::getOpenFileName(this,tr("Open File"),"",tr("Files (*.txt)"));
     if(archivo!=""){
 
@@ -82,7 +79,10 @@ MainWindow::MainWindow(QWidget *parent) :
                         }
                         if(vuelta2==5){
                             stops=QString::fromStdString(cadena3).toInt();
-                            carros.push_back(new Carro(placa,marca,cilindraje,gasmax));
+
+                        }
+                        if(vuelta2==6){
+                            carros.push_back(new Carro(placa,marca,cilindraje,gasmax,QString::fromStdString(cadena3)));
                             carros[carros.size()-1]->setGasActual(gasactual);
                             carros[carros.size()-1]->setStops(stops);
                         }
@@ -115,14 +115,7 @@ MainWindow::MainWindow(QWidget *parent) :
             cf.clear();
         }
         entrada.close();
-        for(int i=0;i<carros.size();i++){
-            QTreeWidgetItem *treeItem2=new QTreeWidgetItem();
-            treeItem2->setText(0,carros[i]->getPlaca());
-            treeItem2->setText(1,carros[i]->getMarca());
-            treeItem2->setText(2,QString::number(carros[i]->getCilindraje()));
-            treeItem->addChild(treeItem2);
-            ui->listWidget->addItem(new QListWidgetItem(carros[i]->getPlaca()));
-        }
+        itemstree();
 
 
 
@@ -143,6 +136,7 @@ void MainWindow:: closeEvent(QCloseEvent *event){
             salida.open(archivo.toStdString().c_str(),ios::out|ios::trunc);
             for(int i=0;i<carros.size();i++){
                 salida<<*carros[i];
+                delete carros[i];
             }
 
             salida.close();}
@@ -163,7 +157,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    Carro *c=new Carro(ui->lt_placa->text(),ui->lt_marca->text(),(ui->lt_cilindraje->text()).toInt(),(ui->lt_gasmax->text()).toInt());
+    Carro *c=new Carro(ui->lt_placa->text(),ui->lt_marca->text(),(ui->lt_cilindraje->text()).toInt(),(ui->lt_gasmax->text()).toInt(),ui->cb_gasolina->currentText());
     ui->lt_placa->setText("");
     ui->lt_marca->setText("");
     ui->lt_cilindraje->setText("");
@@ -218,8 +212,89 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
     }
     if(bandera){
         stringstream ss;
+        ss<<"Marca: "<< carros[indice]->getMarca().toStdString()<< "\nCilindraje: "<<carros[indice]->getCilindraje()<<"\nCapacidad de gasolina: "<<carros[indice]->getGasMax()<<" L\n";
+        ss<<"Tipo de Gasolina: "<< carros[indice]->getTipo().toStdString()<<"\n";
         ss<<"Promedio km/L: "<<carros[indice]->promediokml()<<"\nPromedio km/G: "<<carros[indice]->promediokmg()
          <<"\nPromedio Lemp/km: "<<carros[indice]->promediolempkm()<<"\nPromedio Lemp/dia: "<<carros[indice]->promediolempdia();
         ui->tf_promedios->setText(ss.str().c_str());
     }
+}
+void MainWindow:: itemstree(){
+      ui->treeWidget->setColumnCount(3);
+      treeItem = new QTreeWidgetItem(ui->treeWidget);
+      treeItem->setText(0,"Placa");
+      treeItem->setText(1,"Marca");
+      treeItem->setText(2,"Cilindraje");
+      for(int i=0;i<carros.size();i++){
+          QTreeWidgetItem *treeItem2=new QTreeWidgetItem();
+          treeItem2->setText(0,carros[i]->getPlaca());
+          treeItem2->setText(1,carros[i]->getMarca());
+          treeItem2->setText(2,QString::number(carros[i]->getCilindraje()));
+          treeItem->addChild(treeItem2);
+          ui->listWidget->addItem(new QListWidgetItem(carros[i]->getPlaca()));
+      }
+
+  }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    posicion++;
+    if(posicion==carros.size()){
+        posicion=0;
+    }
+    ui->mlt_placa->setText(carros[posicion]->getPlaca());
+    ui->mlt_marca->setText(carros[posicion]->getMarca());
+    ui->mlt_cilindraje->setText(QString::number(carros[posicion]->getCilindraje()));
+    ui->mlt_capacidad->setText(QString::number(carros[posicion]->getGasMax()));
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    posicion--;
+    if(posicion==-1)
+        posicion=carros.size()-1;
+    ui->mlt_placa->setText(carros[posicion]->getPlaca());
+    ui->mlt_marca->setText(carros[posicion]->getMarca());
+    ui->mlt_cilindraje->setText(QString::number(carros[posicion]->getCilindraje()));
+    ui->mlt_capacidad->setText(QString::number(carros[posicion]->getGasMax()));
+
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    carros[posicion]->setMarca(ui->mlt_marca->text());
+    carros[posicion]->setCilindraje(ui->mlt_cilindraje->text().toInt());
+    carros[posicion]->setGasMax(ui->mlt_capacidad->text().toDouble());
+    ui->treeWidget->clear();
+    itemstree();
+
+}
+
+void MainWindow::on_Eliminar_tabBarClicked(int index)
+{
+    posicion=0;
+    if(index==1 && carros.size()!=0){
+        ui->mlt_placa->setText(carros[0]->getPlaca());
+        ui->mlt_marca->setText(carros[0]->getMarca());
+        ui->mlt_cilindraje->setText(QString::number(carros[0]->getCilindraje()));
+        ui->mlt_capacidad->setText(QString::number(carros[0]->getGasMax()));
+    }
+    if(index==1 && carros.size()!=0){
+        ui->cb_carros->clear();
+        for(int i=0;i<carros.size();i++){
+            ui->cb_carros->addItem(carros[i]->getPlaca());
+        }
+    }
+
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    int posicion=ui->cb_carros->currentIndex();
+    carros.removeAt(posicion);
+    ui->treeWidget->clear();
+    itemstree();
+    ui->listWidget->clear();
+    for(int i=0;i<carros.size();i++)
+        ui->listWidget->addItem(carros[i]->getPlaca());
 }

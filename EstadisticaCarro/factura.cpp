@@ -6,11 +6,18 @@
 #include <cstring>
 #include <iostream>
 using namespace std;
-Factura::Factura(double gasmax, double gasactual,double km):km(km)
+Factura::Factura(double gasmax, double gasactual,double km,QString tipo):km(km)
 {
     stringstream ss;
     litros=gasmax-gasactual;
-    lempiras= litros * 25.00;
+    double precio;
+    if(tipo=="Diesel")
+        precio= 23.6;
+    if(tipo=="Regular")
+        precio= 25.5;
+    if(tipo=="Super")
+        precio=27.06;
+    lempiras= litros * precio;
     time_t t = time(0);
     struct tm *ltm = localtime(& t);
     ss<<ltm->tm_mday<<"/"<<(1+ltm->tm_mon)<<"/"<<(1900+ltm->tm_year);

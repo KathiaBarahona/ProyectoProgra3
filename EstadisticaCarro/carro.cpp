@@ -3,7 +3,7 @@
 #include <vector>
 #include <qstring.h>
 Carro::Carro(){}
-Carro::Carro(QString placa, QString marca, int cilindraje, int gasmax):placa(placa),marca(marca),cilindraje(cilindraje),gasmax(gasmax)
+Carro::Carro(QString placa, QString marca, int cilindraje, int gasmax, QString tipo):placa(placa),marca(marca),cilindraje(cilindraje),gasmax(gasmax),tipo(tipo)
 {
     gasactual=0;
     stops=0;
@@ -69,11 +69,31 @@ double Carro::promediolempdia()const{
     return lempirastotales/diastotales;
 }
 ostream& operator <<(ostream& output,Carro& c){
-    output<<c.placa.toStdString()<<","<<c.marca.toStdString()<<","<<c.cilindraje<<","<<c.gasmax<<","<<c.gasactual<<","<<c.stops<<";";
+    output<<c.placa.toStdString()<<","<<c.marca.toStdString()<<","<<c.cilindraje<<","<<c.gasmax<<","<<c.gasactual<<","<<c.stops<<","<<c.tipo.toStdString()<<";";
     for(int i=0;i<c.facturas.size();i++)
       output<<c.facturas[i];
       output<<endl;
     return output;
 }
+void Carro::setPlaca(QString placa){
+    this->placa=placa;
+}
 
+void Carro::setMarca(QString marca){
+    this->marca=marca;
+}
 
+void Carro::setCilindraje(int cilindraje){
+    this->cilindraje=cilindraje;
+}
+
+void Carro::setGasMax(double gasmax){
+    this->gasmax=gasmax;
+}
+
+QString Carro::getTipo()const{
+    return tipo;
+}
+void Carro::setTipo(QString tipo){
+    this->tipo=tipo;
+}
