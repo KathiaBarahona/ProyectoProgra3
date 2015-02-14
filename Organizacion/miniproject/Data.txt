@@ -1,0 +1,3 @@
+Nombre-Texto-15
+Edad-Entero-15
+Sexo-Texto-2
